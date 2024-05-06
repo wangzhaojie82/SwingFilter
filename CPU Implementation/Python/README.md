@@ -1,10 +1,6 @@
 # Python implementation of Bounce Filter
 
-
-
 This folder contains python scripts for conducting experiments related to network measurement tasks. 
-
-
 
 ## Scripts list
 
@@ -21,8 +17,6 @@ This folder contains python scripts for conducting experiments related to networ
 - filters/\* : Implementations of related filters
 
 - sketches/\* :  Implementations of related measurement solutions
-
-
 
 ## Basic Usage
 
