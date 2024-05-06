@@ -95,8 +95,6 @@ def run_parallel():
 
     traffic_traces = ['./data/your_dataset.txt']
 
-    # top
-
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = []
 
@@ -108,9 +106,7 @@ def run_parallel():
                                 traffic_traces=traffic_traces,
                                 memory_kb=memory_kb))
 
-
         concurrent.futures.wait(futures)
-
 
 
 
