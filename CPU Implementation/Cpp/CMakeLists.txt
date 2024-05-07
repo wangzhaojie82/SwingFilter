@@ -13,4 +13,8 @@ add_executable(BounceFilter_Cpp main.cpp
         header/BounceFilter.h
         LogLogFilter.cpp
         header/LogLogFilter.h
+        header/ColdFilter.h
+        ColdFilter.cpp
+        ASketch.cpp
+        header/ASketch.h
 )

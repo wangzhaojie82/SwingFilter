@@ -1,8 +1,6 @@
 # C++ implementation
 
-This is a C++ implementation for BounceFilter and related solutions.
-
-
+This is a C++ implementation for BounceFilter and related solutions. The source code for LadderFilter is provided by the authors in their repository [LadderFilterCode/LadderFilter (github.com)](https://github.com/LadderFilterCode/LadderFilter).
 
 ## Project Structure
 
@@ -14,10 +12,14 @@ BounceFilter_Cpp/
 │   ├── Sketch.h
 │   ├── CountMin.h
 │   ├── BounceFilter.h
+│   ├── ColdFilter.h
+│   ├── ASketch.h
 │   └── LogLogFilter.h
 ├── MurmurHash3.cpp
 ├── CountMin.cpp
 ├── BounceFilter.cpp
+├── ColdFilter.cpp
+├── ASketch.cpp
 └── LogLogFilter.cpp
 ```
 
