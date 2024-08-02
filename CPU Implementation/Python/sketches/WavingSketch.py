@@ -93,10 +93,7 @@ class WavingSketch:
                     min_cell.frequency = estimated_frequency
                     min_cell.flag = False
 
-    def report(self, flow_label):
-        '''
-        Unbiased estimation
-        '''
+    def report_unbiased(self, flow_label):
 
         bucket_index = self.hash_h(flow_label)
         bucket = self.buckets[bucket_index]
@@ -111,6 +108,32 @@ class WavingSketch:
             return bucket.waving_counter * self.hash_s(flow_label)
 
 
+    def report(self, flow_label):
+
+        bucket_index = self.hash_h(flow_label)
+        bucket = self.buckets[bucket_index]
+
+        # Check if the flow is in the heavy part
+        cell_index, cell = bucket.find_cell(flow_label)
+        if cell is not None:
+            # Return frequency if flow is in the heavy part
+            return cell.frequency
+        else:
+            # Return estimated size if flow is not in the heavy part or flag is False
+            return bucket.waving_counter * self.hash_s(flow_label)
+
+
+    def memory_usage(self):
+        '''
+        :return: memory in kb
+        '''
+        # Calculate the number of buckets based on the memory size
+        # Each bucket has a 32-bit waving_counter
+        # and 16 cells * (32-bit flow_label + 18-bit frequency + 1-bit flag)
+        bucket_size = 32 + 16 * (32 + 32 + 1)  # size in bits
+        memory_kb = (self.num_buckets * bucket_size)/(1024 * 8)
+        return round(memory_kb)
+
 
 def init_WavingSketch(memory_kb):
     """
@@ -119,9 +142,7 @@ def init_WavingSketch(memory_kb):
     :return: A WavingSketch object.
     """
     # Calculate the number of buckets based on the memory size
-    # Each bucket has a 32-bit waving_counter
-    # and 16 cells * (32-bit flow_label + 32-bit frequency + 1-bit flag)
-    bucket_size = 32 + 16 * (32 + 32 + 1)  # size in bits
+    bucket_size = 20 + 12 * (32 + 32 + 1)  # size in bits
     num_buckets = int((memory_kb * 1024 * 8) / bucket_size)  # Convert KB to bits
 
     return WavingSketch(num_buckets)

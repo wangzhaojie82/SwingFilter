@@ -52,7 +52,6 @@ class SpaceSaving:
         """
 
         if k > self.l:
-            print("Warning: k exceeds the maximum number of counters (l) in Space Saving, results may be inaccurate.")
             top_k_elements = self.counts.most_common(self.l)
             top_k_elements.extend([("", 0)] * (k - self.l))
         else:

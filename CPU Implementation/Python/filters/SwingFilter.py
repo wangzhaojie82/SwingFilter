@@ -2,8 +2,8 @@ import mmh3
 import statistics
 
 
-# Bounce Filter
-class BounceCounter:
+# Swing Filter
+class SwingCounter:
 
     def __init__(self, num_counters, bits=10, d=3):
         '''
@@ -72,12 +72,12 @@ class BounceCounter:
 
     def update(self, packet):
         '''
-        Update the Bounce Counter with a packet
+        Update the Swing Counter with a packet
         :param packet: new packet
         :return: Flag in {True: Successfully update; False: Fail to update}
         '''
 
-        # update the bounce counter
+        # update the Swing counter
         counter_index = self.find_1_counter(packet)
         op_ = self.hash_s(packet.flow_label, counter_index)
 
@@ -93,14 +93,14 @@ class BounceCounter:
             return True
 
 
-class BounceFilter:
+class SwingFilter:
     def __init__(self, layers, layers_config):
         """
-        :param layers: the layers of BounceCounters
+        :param layers: the layers of SwingCounters
         :param layers_config: List of tuples, each tuple contains the configuration (num_counters, bits, k) for a layer
         """
         self.layers = layers
-        self.filter = [BounceCounter(num_counters, bits, k) for num_counters, bits, k in layers_config]
+        self.filter = [SwingCounter(num_counters, bits, k) for num_counters, bits, k in layers_config]
         self.layers_config = layers_config # 各层的参数
 
     def update(self, packet):
@@ -108,8 +108,8 @@ class BounceFilter:
         Update the filter with a new packet
         :return: True if the update was successful within the filter, False if it overflows out of the filter
         """
-        for bounce_counter in self.filter:
-            updated_successfully = bounce_counter.update(packet)
+        for Swing_counter in self.filter:
+            updated_successfully = Swing_counter.update(packet)
             if updated_successfully:
                 return True
 
@@ -126,20 +126,20 @@ class BounceFilter:
         estimation = 0
         large_flow_flag = True # report whether this flow is a large flow. True: is a large Flow
 
-        for bounce_counter in self.filter:
+        for Swing_counter in self.filter:
 
             k_es_values = []
-            counter_indices = bounce_counter.find_d_counters(flow_label)
+            counter_indices = Swing_counter.find_d_counters(flow_label)
             for index in counter_indices:
-                op_ = bounce_counter.hash_s(flow_label, index)
-                es_ = bounce_counter.counters[index] * op_
+                op_ = Swing_counter.hash_s(flow_label, index)
+                es_ = Swing_counter.counters[index] * op_
                 k_es_values.append(es_)
 
             s_value = sum(k_es_values)
 
-            num_hash = bounce_counter.d
+            num_hash = Swing_counter.d
             # if the estimated size less than counter capacity of this layer
-            if s_value < num_hash * ((1 << (bounce_counter.bits - 1)) - 1) :
+            if s_value < num_hash * ((1 << (Swing_counter.bits - 1)) - 1) :
                 estimation += s_value
                 large_flow_flag = False 
                 break
@@ -147,23 +147,24 @@ class BounceFilter:
                 estimation += s_value
 
         return estimation, large_flow_flag
+        # return estimation
 
 
     def memory_usage(self):
         """
-        Calculate the total memory usage of the BounceFilter
+        Calculate the total memory usage of the SwingFilter
         :return: memory in kb
         """
         memory_usage = 0
-        for bounce_counter in self.filter:
+        for Swing_counter in self.filter:
             # Storage for each layer = num_counters * bits
-            memory_usage += bounce_counter.num_counters * bounce_counter.bits
+            memory_usage += Swing_counter.num_counters * Swing_counter.bits
 
         memory_kb = memory_usage / (1024 * 8)
         return round(memory_kb)
 
 
-def init_BounceFilter(memory_kb):
+def init_SwingFilter(memory_kb):
     '''
     :param memory_kb: KB
     :return:
@@ -171,6 +172,7 @@ def init_BounceFilter(memory_kb):
     d = 3
 
     bits = [4, 8]
+    # bits = [2, 4]
 
     memory_bits = memory_kb * 1024 * 8
 
@@ -184,6 +186,6 @@ def init_BounceFilter(memory_kb):
     conf_layer0 = (num_counters_layer_0, bits[0], d)
     conf_layer1 = (num_counters_layer_1, bits[1], d)
     layers_config = [conf_layer0, conf_layer1]
-    BF = BounceFilter(2, layers_config)
+    BF = SwingFilter(2, layers_config)
     return BF
 

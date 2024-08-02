@@ -50,8 +50,6 @@ class ElasticSketch:
                 self.count_min.update_with_weight(replaced_flow[0], replaced_flow[1])
 
 
-
-
     def report(self, flow_label):
         '''
         estimate the size of given flow for flow size estimation task
@@ -76,87 +74,18 @@ class ElasticSketch:
             return self.count_min.report(flow_label)
 
 
-
-    def heavy_hitter_query(self, heavy_hitter_threshold):
-        '''
-        query for heavy hitters (items with frequency above heavy_hitter_threshold)
-        :param heavy_hitter_threshold: threshold for heavy hitter detection
-        :return: list of heavy hitters, each represented as a tuple (flow, size)
-        '''
-
-        heavy_hitters = []
-
-        for bucket_index, (flow_label, vote_plus, flag, vote_minus) in enumerate(self.heavy_part):
-
-            total_size = vote_plus
-            if flag:  # If flag is True, check CountMin for the size
-                size_in_light = self.count_min.report(flow_label)
-                total_size += size_in_light
-
-            if total_size > heavy_hitter_threshold:
-                heavy_hitters.append((flow_label, total_size))
-
-        return heavy_hitters
-
-
-
-    def heavy_hitter_query_with_filter(self, filter, heavy_hitter_threshold):
-        '''
-        Because the filter intercept some packets, the total value in a bucket may be
-        less than the threshold,
-        so check whether estimated size plus filter estimation larger than threshold.
-
-        query for heavy hitters (items with frequency above heavy_hitter_threshold)
-        :param filter: a filter combined with
-        :param heavy_hitter_threshold: threshold for heavy hitter detection
-        :return: list of heavy hitters, each represented as a tuple (flow, size)
-        '''
-
-        heavy_hitters = []
-
-        for bucket_index, (flow_label, vote_plus, flag, vote_minus) in enumerate(self.heavy_part):
-
-            total_size = vote_plus
-
-            if flag:  # If flag is True, check CountMin for the size
-                size_in_light = self.count_min.report(flow_label)
-                total_size += size_in_light
-
-            size_in_filter, _ = filter.report(flow_label)
-            total_size += size_in_filter
-
-            if total_size > heavy_hitter_threshold:
-                heavy_hitters.append((flow_label, total_size))
-
-        return heavy_hitters
-
-
-    def all_heavy_flows(self):
-        heavy_flows = []
-
-        for bucket_index, (flow_label, vote_plus, flag, vote_minus) in enumerate(self.heavy_part):
-
-            total_size = vote_plus
-            if flag:  # If flag is True, check CountMin for the size
-                size_in_light = self.count_min.report(flow_label)
-                total_size += size_in_light
-
-            heavy_flows.append((flow_label, total_size))
-
-        return heavy_flows
-
-
-
 def init_ElasticSketch(memory_size_kb):
 
-    memory_4_CM = memory_size_kb // 2
+    memory_4_light = memory_size_kb // 2
 
     # calculate number of buckets in heavy part
     # each bucket is 97 bits: 32 label + 32 positive vote + 1 flag + 32 negative vote
-    len_heavy = ((memory_size_kb - memory_4_CM) * 1024 * 8) // 97
+    len_heavy = ((memory_size_kb - memory_4_light) * 1024 * 8) // 97
 
-    CM = CountMin.init_CountMin(memory_4_CM)
+    light_part = CountMin.init_CountMin(memory_4_light)
+    # light_part = SwingFilter.init_SwingFilter(memory_4_light)
 
-    Elastic = ElasticSketch(len_heavy, CM)
+
+    Elastic = ElasticSketch(len_heavy, light_part)
 
     return Elastic

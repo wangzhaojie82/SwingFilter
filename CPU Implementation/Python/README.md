@@ -1,4 +1,4 @@
-# Python implementation of Bounce Filter
+# Python implementation of Swing Filter
 
 This folder contains python scripts for conducting experiments related to network measurement tasks. 
 
@@ -12,11 +12,9 @@ This folder contains python scripts for conducting experiments related to networ
 
 - Exp_Heavy_Hitter_Detection_.py: This script is to conduct experiments related to heavy hitter detection.
 
-- Exp_Heavy_Change_Detection_.py: This script is to conduct experiments related to heavy change detection.
+- filters/\* : Implementations of related filters and the list of large flows in Augmented Sketch
 
-- filters/\* : Implementations of related filters
-
-- sketches/\* :  Implementations of related measurement solutions
+- sketches/\* :  Implementations of related sketches
 
 ## Basic Usage
 

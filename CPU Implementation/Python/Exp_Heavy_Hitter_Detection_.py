@@ -3,42 +3,39 @@ import time
 import re
 import Packet
 
-from filters import BounceFilter
-from sketches import ElasticSketch, MVSketch
+from filters import SwingFilter
+from sketches import MVSketch
 
 
 def calculate_metrics(heavy_hitter_threshold, heavy_hitters, all_flows):
 
     true_heavy_hitters = set()
-
     for flow_label, true_size in all_flows.items():
         if true_size > heavy_hitter_threshold:
             true_heavy_hitters.add(flow_label)
-
     true_positives = 0
     total_relative_error = 0
-
+    num_are = 0
     for flowlabel, estimated_size in heavy_hitters:
-        if flowlabel in true_heavy_hitters:
+        # the reported flow exists
+        if flowlabel in all_flows.keys():
             true_size = all_flows[flowlabel]
+
             if true_size > 0:
                 relative_error = abs(estimated_size - true_size) / true_size
-                true_positives += 1
                 total_relative_error += relative_error
+                num_are += 1
 
-
+        if flowlabel in true_heavy_hitters:
+            true_positives += 1
 
     average_relative_error, precision, recall, f1 = 0, 0, 0, 0
 
     # Calculate average relative error
-    if true_positives > 0:
-        average_relative_error = round(total_relative_error / true_positives, 3)
+    average_relative_error = round(total_relative_error / num_are, 3)
 
-    # Calculate Precision
     if len(heavy_hitters) > 0:
         precision = round(true_positives / len(heavy_hitters), 3)
-
-    # Calculate recall
     if len(true_heavy_hitters) > 0:
         recall = round(true_positives / len(true_heavy_hitters), 3)
 
@@ -46,19 +43,15 @@ def calculate_metrics(heavy_hitter_threshold, heavy_hitters, all_flows):
     if precision + recall > 0:
         f1 = round(2 * (precision * recall) / (precision + recall), 3)
 
-    return average_relative_error, precision, recall, f1
+    return average_relative_error, f1
 
 
 def heavy_hitter_d(**kwargs):
 
     traffic_traces = kwargs['traffic_traces']
-    memory_kb = kwargs['memory_kb']
-
-    filter_ = BounceFilter.init_BounceFilter(memory_kb * 0.2)
-    sketch_ = ElasticSketch.init_ElasticSketch(memory_kb * 0.8)
-
-    # sketch_ = MVSketch.init_MVSketch(memory_kb * 0.8)
-
+    memory_kb = kwargs['memory']
+    filter_ = SwingFilter.init_SwingFilter(memory_kb * 0.2)
+    sketch_ = MVSketch.init_MVSketch(memory_kb * 0.8)
     all_flows = {}
     total_packets = 0
     # regular expression to match IPv4 address
@@ -86,8 +79,6 @@ def heavy_hitter_d(**kwargs):
                 else:
                     sketch_.update(packet)
 
-                # sketch_.update(packet)
-
 
     heavy_hitter_threshold = kwargs['heavy_hitter_threshold']
 
@@ -97,11 +88,9 @@ def heavy_hitter_d(**kwargs):
         for threshold in heavy_hitter_threshold:
 
             heavy_hitters = sketch_.heavy_hitter_query_with_filter(filter_, threshold)
-            # heavy_hitters = sketch_.heavy_hitter_query(threshold)
 
-            ARE, PR, CR, F1 = calculate_metrics(threshold, heavy_hitters, all_flows)
-            file.write(f"HH threshold = {threshold}  |  ARE = {ARE}  |  Precision = {PR}  |  "
-                       f"Recall = {CR}  |  F1 = {F1} \n")
+            ARE, F1 = calculate_metrics(threshold, heavy_hitters, all_flows)
+            file.write(f"HH threshold = {threshold}  |  ARE = {ARE}  |  F1 = {F1} \n")
             file.write(f"\n")
 
 
@@ -113,17 +102,17 @@ def run_parallel():
 
     traffic_traces = ['./data/your_dataset.txt']
 
-    heavy_hitter_threshold = [100, 500, 1000, 2000, 4000, 6000, 8000, 10000]
+    heavy_hitter_threshold = [1000, 2000, 4000, 6000, 8000, 10000]
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
 
         futures = []
-        for memory_kb in [100, 200]:
+        for memory in [80]:
 
             futures.append(
                 executor.submit(run_method, heavy_hitter_d, traffic_traces=traffic_traces,
                                 heavy_hitter_threshold=heavy_hitter_threshold,
-                                memory_kb=memory_kb))
+                                memory=memory))
 
         concurrent.futures.wait(futures)
 

@@ -72,7 +72,8 @@ def init_CUSketch(memory_kb):
     counter_bits = 32 # bits
 
     total_counters = (memory_kb * 1024 * 8) // counter_bits
-    depth = int(np.log2(total_counters))
+    # depth = int(np.log2(total_counters))
+    depth = 4
     width = int(total_counters / depth)
 
     CU = CUSketch(width, depth, counter_bits)

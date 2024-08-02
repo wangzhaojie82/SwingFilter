@@ -79,7 +79,8 @@ def init_CountSketch(memory_kb):
 
     # Calculate total number of counters based on memory size and counter size
     total_counters = (memory_kb * 1024 * 8) // counter_bits
-    depth = int(math.log2(total_counters))
+    # depth = int(math.log2(total_counters))
+    depth = 4
     width = int(total_counters / depth)
 
     # Create and return a CountSketch instance
