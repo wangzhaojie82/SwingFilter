@@ -92,35 +92,12 @@ void flow_size_estimation(Sketch* sketch, vector<pair<int, char*>> dataset){
 
 
 void process(Sketch* sketch, const string& ip_trace){
-    /*
-     * process the dataset on path: ip_trace
-     */
 
-    //vector<pair<char*, char*>> dataset = readDataSet(ip_trace);
     vector<pair<int, char*>> dataset = readDataSet(ip_trace);
 
-    auto start_time = chrono::steady_clock::now();
     for (const auto& data : dataset) {
         sketch->update(data.first, data.second,1);
     }
-    auto end_time = chrono::steady_clock::now();
-
-    auto elapsed_time = chrono::duration_cast<chrono::seconds>(end_time - start_time).count();
-    double throughput_mpps = static_cast<double>(dataset.size()) / elapsed_time / 1000000.0;
-    cout << "Update Throughput: " << throughput_mpps << " Mpps" << endl;
-
-
-    // ----------
-
-    auto start_time_query = chrono::steady_clock::now();
-    for (const auto& data : dataset) {
-        sketch->report(data.second);
-    }
-    auto end_time_query = chrono::steady_clock::now();
-
-    auto elapsed_time_query = chrono::duration_cast<chrono::seconds>(end_time_query - start_time_query).count();
-    double throughput_mpps_query = static_cast<double>(dataset.size()) / elapsed_time_query / 1000000.0;
-    cout << "Query Throughput: " << throughput_mpps_query << " Mfps" << endl;
 
     flow_size_estimation(sketch, dataset);
 }
