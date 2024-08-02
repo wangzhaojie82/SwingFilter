@@ -8,6 +8,7 @@ crc32_polinomials = [0x04C11DB7, 0xEDB88320, 0xDB710641, 0x82608EDB, 0x741B8CD7,
 
 
 class BFController(object):
+    # Swing filter
 
     def __init__(self, sw_name):
 
