@@ -1,8 +1,8 @@
 
 #include <numeric>
-#include "header/BounceFilter.h"
+#include "header/SwingFilter.h"
 
-BounceFilter::BounceFilter(float memory_kb, Sketch* sketch1): sketch(sketch1){
+SwingFilter::SwingFilter(float memory_kb, Sketch* sketch1): sketch(sketch1){
     d = 3;
     bits[0] = 4;
     bits[1] = 8;
@@ -14,7 +14,7 @@ BounceFilter::BounceFilter(float memory_kb, Sketch* sketch1): sketch(sketch1){
 
     uint32_t memory_bits = static_cast<uint32_t>(std::round(memory_kb * 1024 * 8));
 
-    // Memory allocation: BF two layers of memory each occupy 50%
+    // Memory allocation: SF two layers of memory each occupy 50%
     uint32_t memory_bits_layer_0 = static_cast<uint32_t>(std::round(memory_bits * 0.5));
     uint32_t memory_bits_layer_1 = memory_bits - memory_bits_layer_0;
 
@@ -35,14 +35,14 @@ BounceFilter::BounceFilter(float memory_kb, Sketch* sketch1): sketch(sketch1){
 }
 
 
-int BounceFilter::hash_s(const char* flow_label, uint32_t& counter_index) {
+int SwingFilter::hash_s(const char* flow_label, uint32_t& counter_index) {
     uint32_t hash_value = 0;
     MurmurHash3_x86_32(flow_label, KEY_LEN, counter_index, &hash_value);
     return hash_value % 2 == 0;
 }
 
 
-void BounceFilter::update(const int packet_id, const char* flow_label, uint32_t weight){
+void SwingFilter::update(const int packet_id, const char* flow_label, uint32_t weight){
 
     uint32_t index_hash; // used to calculate the counter index
     uint32_t rand_value = packet_id % d;
@@ -78,7 +78,7 @@ void BounceFilter::update(const int packet_id, const char* flow_label, uint32_t 
 }
 
 
-int BounceFilter::report(const char* flow_label){
+int SwingFilter::report(const char* flow_label){
     int estimation = 0;
     uint32_t hash_value = 0;
     bool large_flow_flag = true;

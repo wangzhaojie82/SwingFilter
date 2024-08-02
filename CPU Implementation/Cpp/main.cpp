@@ -6,7 +6,7 @@
 #include <vector>
 #include <set>
 #include "./header/CountMin.h"
-#include "./header/BounceFilter.h"
+#include "./header/SwingFilter.h"
 #include "./header/LogLogFilter.h"
 using namespace std;
 
@@ -139,9 +139,9 @@ int main() {
     float filter_memory_kb = total_memory_kb * 0.33;
 
     CountMin CM = CountMin(total_memory_kb - filter_memory_kb);
-    BounceFilter BF = BounceFilter(filter_memory_kb, &CM);
+    SwingFilter SF = SwingFilter(filter_memory_kb, &CM);
 
-    process(&BF,ip_trace);
+    process(&SF,ip_trace);
     cout << "-------------------------------\n" << endl;
 
     return 0;

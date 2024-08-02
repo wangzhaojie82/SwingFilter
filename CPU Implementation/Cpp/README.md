@@ -1,25 +1,23 @@
 # C++ implementation
 
-This is a C++ implementation for BounceFilter and related solutions. The source code for LadderFilter is provided by the authors in their repository [LadderFilterCode/LadderFilter (github.com)](https://github.com/LadderFilterCode/LadderFilter).
+This is a C++ implementation for SwingFilter and related solutions. The source code for LadderFilter is provided by the authors in their repository [LadderFilterCode/LadderFilter (github.com)](https://github.com/LadderFilterCode/LadderFilter).
 
 ## Project Structure
 
 ```
-BounceFilter_Cpp/
+SwingFilter_Cpp/
 ├── main.cpp
 ├── header/
 │   ├── MurmurHash3.h
 │   ├── Sketch.h
 │   ├── CountMin.h
-│   ├── BounceFilter.h
+│   ├── SwingFilter.h
 │   ├── ColdFilter.h
-│   ├── ASketch.h
 │   └── LogLogFilter.h
 ├── MurmurHash3.cpp
 ├── CountMin.cpp
-├── BounceFilter.cpp
+├── SwingFilter.cpp
 ├── ColdFilter.cpp
-├── ASketch.cpp
 └── LogLogFilter.cpp
 ```
 
@@ -37,7 +35,7 @@ $ make
 ### Execution
 
 ```bash
-$ ./BounceFilter_Cpp
+$ ./SwingFilter_Cpp
 ```
 
 ## Requirements

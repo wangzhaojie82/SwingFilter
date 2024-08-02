@@ -5,7 +5,7 @@
 #include "MurmurHash3.h"
 #include "Sketch.h"
 
-class BounceFilter : public Sketch{
+class SwingFilter : public Sketch{
 private:
     int d; // num of hash per layer
     int bits[2]; // counter bits per layer
@@ -16,7 +16,7 @@ private:
     Sketch* sketch;
 
 public:
-    BounceFilter(float memory_kb, Sketch* sketch1);
+    SwingFilter(float memory_kb, Sketch* sketch1);
 
     int hash_s(const char* flow_label, uint32_t& counter_index);
 
@@ -25,7 +25,7 @@ public:
     int report(const char* flow_label);
 
     // Destructor to free memory
-    ~BounceFilter() {
+    ~SwingFilter() {
         delete[] counters[0];
         delete[] counters[1];
     }
