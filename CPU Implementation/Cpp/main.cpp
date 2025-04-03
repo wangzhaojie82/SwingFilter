@@ -47,48 +47,27 @@ vector<pair<int, char*>> readDataSet(const string& file_path) {
 
 
 void flow_size_estimation(Sketch* sketch, vector<pair<int, char*>> dataset){
-
-    unordered_map<string, int> real_flows;
-    unordered_map<string, int> estimated_flows;
-    set<string> processed;
-
+    std::map<string, int> real_flows;
     for (const auto& data : dataset) {
-
-        if (real_flows.count(data.second) == 0) {
-            real_flows[data.second] = 1;
-        } else {
-            real_flows[data.second]++;
-        }
-
-        if (processed.find(data.second) != processed.end()) {
-            continue;
-        }else{
-            int estimated_size = sketch->report(data.second);
-            estimated_flows[data.second] = estimated_size;
-            processed.insert(data.second);
-        }
+        real_flows[data.second]++;
     }
 
     // Estimate flow sizes and calculate average relative error
     double total_relative_error = 0.0;
-    int total_flows = 0;
+    uint32_t total_flows = 0;
 
     // Estimate flow sizes
     for (const auto& pair : real_flows) {
-        string flow_label_str = pair.first;
-        int real_size = pair.second;
-        int estimated_size = estimated_flows[flow_label_str];
-
-        double relative_error = fabs((estimated_size - real_size) / static_cast<double>(real_size));
+        int size = pair.second;
+        int estimated_size = sketch->report(pair.first);
+        double relative_error = std::abs(static_cast<float>(estimated_size) - static_cast<float>(size)) / static_cast<float>(size);
         total_relative_error += relative_error;
         total_flows++;
     }
 
     double average_relative_error = total_relative_error / total_flows;
     std::cout << "ARE: " << average_relative_error << std::endl;
-
 }
-
 
 
 void process(Sketch* sketch, const string& ip_trace){
