@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.26)
 project(SwingFilter_Cpp)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_BUILD_TYPE Release)
 
 add_executable(SwingFilter_Cpp main.cpp
         header/MurmurHash3.h

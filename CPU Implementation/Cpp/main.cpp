@@ -5,9 +5,11 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <map>
 #include "./header/CountMin.h"
 #include "./header/SwingFilter.h"
 #include "./header/LogLogFilter.h"
+#include "header/ColdFilter.h"
 using namespace std;
 
 
@@ -20,7 +22,7 @@ vector<pair<int, char*>> readDataSet(const string& file_path) {
         cerr << "Failed to open file: " << file_path << endl;
     }
 
-    int total_packets = 0;
+    uint32_t total_packets = 0;
     string line;
     while (getline(file, line)) {
         istringstream iss(line);
@@ -45,21 +47,17 @@ vector<pair<int, char*>> readDataSet(const string& file_path) {
 }
 
 
-
 void flow_size_estimation(Sketch* sketch, vector<pair<int, char*>> dataset){
-    std::map<string, int> real_flows;
+    std::map<std::string, int> real_flows;
     for (const auto& data : dataset) {
-        real_flows[data.second]++;
+        real_flows[std::string(data.second)]++;
     }
 
-    // Estimate flow sizes and calculate average relative error
     double total_relative_error = 0.0;
     uint32_t total_flows = 0;
 
-    // Estimate flow sizes
-    for (const auto& pair : real_flows) {
-        int size = pair.second;
-        int estimated_size = sketch->report(pair.first);
+    for (const auto& [key, size] : real_flows) {
+        int estimated_size = sketch->report(key.c_str());
         double relative_error = std::abs(static_cast<float>(estimated_size) - static_cast<float>(size)) / static_cast<float>(size);
         total_relative_error += relative_error;
         total_flows++;
@@ -70,14 +68,12 @@ void flow_size_estimation(Sketch* sketch, vector<pair<int, char*>> dataset){
 }
 
 
+
 void process(Sketch* sketch, const string& ip_trace){
-
     vector<pair<int, char*>> dataset = readDataSet(ip_trace);
-
     for (const auto& data : dataset) {
         sketch->update(data.first, data.second,1);
     }
-
     flow_size_estimation(sketch, dataset);
 }
 
@@ -85,18 +81,17 @@ void process(Sketch* sketch, const string& ip_trace){
 
 
 int main() {
-    string ip_trace = "../data/your_dataset.txt";
+    string ip_trace = "F:/Project/dataset/CAIDA/ip_traces_2019/caida_2019_ipv4_00.txt";
 
     cout << "Hello! Program starts executing......" << endl;
     cout << "-------------------------------\n" << endl;
 
-    float total_memory_kb = 200;
+    float total_memory_kb = 100;
     cout << "Process: memory_kb="<< total_memory_kb << "KB | " << endl;
     float filter_memory_kb = total_memory_kb * 0.33;
 
     CountMin CM = CountMin(total_memory_kb - filter_memory_kb);
     SwingFilter SF = SwingFilter(filter_memory_kb, &CM);
-
     process(&SF,ip_trace);
     cout << "-------------------------------\n" << endl;
 

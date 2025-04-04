@@ -13,7 +13,7 @@ private:
     int min_negative[2];
     uint32_t num_counters[2]; // num of counters per layer
     int** counters; // filter, array of int arrays
-    Sketch* sketch;
+    Sketch* skt1;
 
 public:
     SwingFilter(float memory_kb, Sketch* sketch1);

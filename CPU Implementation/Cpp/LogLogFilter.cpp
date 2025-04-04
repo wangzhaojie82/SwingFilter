@@ -33,7 +33,7 @@ void LogLogFilter::update(const int packet_id, const char* flow_label, uint32_t 
     uint32_t gamma = 0xffffffff;
     for (int i = 0; i < r; ++i) {
 
-        MurmurHash3_x86_32(flow_label, KEY_LEN, seeds[i], &hash_value);
+        MurmurHash3_x86_32(flow_label, strlen(flow_label), seeds[i], &hash_value);
         //int idx = std::hash<std::string>()(flow_label + std::to_string(seeds[i])) % m;
         int idx = hash_value % m;
 
@@ -42,7 +42,7 @@ void LogLogFilter::update(const int packet_id, const char* flow_label, uint32_t 
     if (gamma < delta) {
         f += 1;
         for (int i = 0; i < r; ++i) {
-            MurmurHash3_x86_32(flow_label, KEY_LEN, seeds[i], &hash_value);
+            MurmurHash3_x86_32(flow_label, strlen(flow_label), seeds[i], &hash_value);
             //int idx = std::hash<std::string>()(flow_label + std::to_string(seeds[i])) % m;
             int idx = hash_value % m;
 
@@ -64,7 +64,7 @@ int LogLogFilter::report(const char* flow_label){
     uint32_t gamma = 0xffffffff;
     for (int i = 0; i < r; ++i) {
 
-        MurmurHash3_x86_32(flow_label, KEY_LEN, seeds[i], &hash_value);
+        MurmurHash3_x86_32(flow_label, strlen(flow_label), seeds[i], &hash_value);
         //int idx = std::hash<std::string>()(flow_label + std::to_string(seeds[i])) % m;
         int idx = hash_value % m;
 
