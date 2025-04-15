@@ -1,11 +1,7 @@
 # P4 Implementation
 
-This is the source code for the P4 implementation.
+This is the source code for the P4 implementation of Swing Filter.
 
 ## Description
 
-We implement Swing Filter on both the BMv2 switch and Tofino switch. Here, we provide the p4 code of Swing Filter on the BMv2 switch. 
-
-We are unable to provide the source code for the Tofino switch due to confidentiality agreements.
-
-
+We implement Swing Filter in P4_16 language. Here, we provide the related code for our implementation. 
