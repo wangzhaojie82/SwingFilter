@@ -96,12 +96,12 @@ def run_parallel():
 
     traffic_traces = ['./data/your_dataset.txt']
 
-    top_k_list = [1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 6000, 7000, 8000, 10000]
+    top_k_list = [1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000]
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = []
 
-        for memory_kb in [20]:
+        for memory_kb in [40, 60]:
             futures.append(
                 executor.submit(run_method, space_saving_test, traffic_traces=traffic_traces,
                                 top_k_list=top_k_list, memory_kb=memory_kb))
