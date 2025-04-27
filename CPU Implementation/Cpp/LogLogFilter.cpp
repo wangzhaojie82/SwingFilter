@@ -3,7 +3,7 @@
 
 LogLogFilter::LogLogFilter(float memory_kb, Sketch* sketch1){
 
-    m = int(memory_kb * 1024 * 8); // 4  # number of registers
+    m = int(memory_kb * 1024 * 8 / 4); // number of registers
     r = 3; // number of hash
     f = 0;
     delta = 10; // the threshold, 10 is recommended in that paper
